@@ -2,14 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gemini_app/presentation/providers/user_provider.dart';
-
-final user = types.User(
-  id: 'user-id-123',
-  firstName: 'Roman',
-  lastName: 'Valero',
-  imageUrl: 'https://picsum.photos/id/177/200/200',
-);
+import 'package:gemini_app/presentation/providers/chat/is_gemini_writing.dart';
+import 'package:gemini_app/presentation/providers/users/user_provider.dart';
 
 final message = <types.Message>[
   // types.TextMessage(author: user, id: Uuid().v4(), text: 'Hola Mundo'),
@@ -22,12 +16,16 @@ class BasicPromptScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //final geminiUser = ref.watch(geminiUserProvider);
+    final geminiUser = ref.watch(geminiUserProvider);
+    final user = ref.watch(userProvider);
+    final isGeminiWriting = ref.watch(isGeminiWritingProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Prompt Basico')),
       body: Chat(
-        messages: message,
+        messages: [
+          types.TextMessage(author: user, id: 'algo', text: 'Hola Planeta'),
+        ],
         onSendPressed: (types.PartialText partialText) {
           print('mensaje: ${partialText.text}');
         },
@@ -36,7 +34,7 @@ class BasicPromptScreen extends ConsumerWidget {
         showUserNames: true,
         //showUserAvatars: true,
         typingIndicatorOptions: TypingIndicatorOptions(
-          //typingUsers: [geminiUser],
+          typingUsers: isGeminiWriting ? [geminiUser] : [],
           customTypingWidget: const Center(
             child: Text('Gemini esta pensando...'),
           ),

@@ -13,3 +13,15 @@ User geminiUser(Ref ref) {
   );
   return geminiUser;
 }
+
+@riverpod
+User user(Ref ref) {
+  final user = User(
+    id: 'user-id-123',
+    firstName: 'Roman',
+    lastName: 'Valero',
+    imageUrl: 'https://picsum.photos/id/177/200/200',
+  );
+
+  return user;
+}
