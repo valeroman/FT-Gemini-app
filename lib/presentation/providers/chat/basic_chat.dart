@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart';
 import 'package:gemini_app/config/gemini/gemini_impl.dart';
 import 'package:gemini_app/presentation/providers/chat/is_gemini_writing.dart';
 import 'package:gemini_app/presentation/providers/users/user_provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -21,9 +21,15 @@ class BasicChat extends _$BasicChat {
     return [];
   }
 
-  void addMessage({required PartialText partialText, required User user}) {
-    // TODO: agrgegar condicion cuando vengan imagenes
-
+  void addMessage({
+    required PartialText partialText,
+    required User user,
+    List<XFile> images = const [],
+  }) {
+    if (images.isNotEmpty) {
+      _addTextMessageWithImages(partialText, user, images);
+      return;
+    }
     _addTextMessage(partialText, user);
   }
 
@@ -31,6 +37,22 @@ class BasicChat extends _$BasicChat {
     _createTextMessage(partialText.text, author);
     //_geminiTextResponse(partialText.text);
     _geminiTextResponseStream(partialText.text);
+  }
+
+  _addTextMessageWithImages(
+    PartialText partialText,
+    User author,
+    List<XFile> images,
+  ) async {
+    for (XFile image in images) {
+      _createImageMessage(image, author);
+    }
+
+    await Future.delayed(Duration(milliseconds: 10));
+
+    _createTextMessage(partialText.text, author);
+    //_geminiTextResponse(partialText.text);
+    //_geminiTextResponseStream(partialText.text);
   }
 
   void _geminiTextResponse(String prompt) async {
@@ -67,6 +89,19 @@ class BasicChat extends _$BasicChat {
       id: uuid.v4(),
       text: text,
       createdAt: DateTime.now().millisecondsSinceEpoch,
+    );
+
+    state = [message, ...state];
+  }
+
+  Future<void> _createImageMessage(XFile image, User author) async {
+    final message = ImageMessage(
+      author: author,
+      id: uuid.v4(),
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+      uri: image.path,
+      name: image.name,
+      size: await image.length(),
     );
 
     state = [message, ...state];

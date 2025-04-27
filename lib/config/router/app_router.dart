@@ -1,4 +1,4 @@
-import 'package:gemini_app/presentation/screens/basic_prompt/basic_prompt.dart';
+import 'package:gemini_app/presentation/screens/basic_prompt/basic_prompt_screen.dart';
 import 'package:gemini_app/presentation/screens/home/home_screen.dart';
 import 'package:go_router/go_router.dart';
 
